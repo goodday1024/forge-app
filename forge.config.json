@@ -1,6 +1,6 @@
 {
-  "name": "我的锻造应用",
-  "url": "https://example.com",
+  "name": "云韶",
+  "url": "https://zihang.fun/",
   "bundleId": "com.forge.myapp",
   "version": "1.0.0",
   "targets": [
@@ -11,12 +11,12 @@
     "linux"
   ],
   "shell": "tauri",
-  "accent": "#c6ff3a",
+  "accent": "#f6e05e",
   "window": {
     "width": 1280,
     "height": 800
   },
   "offline": true,
   "autoUpdate": true,
-  "generatedAt": "2026-06-30T13:02:39.591Z"
+  "generatedAt": "2026-06-30T13:04:01.110Z"
 }
