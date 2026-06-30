@@ -1,0 +1,82 @@
+# FORGE // 网页锻造工坊 — auto-generated workflow
+# 由 https://forge.example 生成 · 通过 forge.config.json 驱动矩阵
+name: FORGE build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: forge-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.gen.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate build matrix from forge.config.json
+        id: gen
+        run: |
+          MATRIX=$(jq -c '{include: [ .targets[] | {
+            target: .,
+            os: (if . == "ios" or . == "macos" then "macos-14"
+                 elif . == "windows" then "windows-latest"
+                 else "ubuntu-latest" end),
+            ext: (if . == "ios" then "ipa"
+                 elif . == "android" then "apk"
+                 elif . == "windows" then "msi"
+                 elif . == "macos" then "dmg"
+                 else "AppImage" end)
+          } ] }' forge.config.json)
+          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+
+  forge:
+    needs: prepare
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Mirror acceleration (CN)
+        if: ${{ vars.FORGE_REGION == 'cn' }}
+        run: |
+          git config --global url."https://gitclone.com/github.com/".insteadOf "https://github.com/"
+          echo "已启用 gitclone 镜像加速"
+
+      - name: Read FORGE config
+        run: |
+          echo "## FORGE config" >> "$GITHUB_STEP_SUMMARY"
+          echo "```json" >> "$GITHUB_STEP_SUMMARY"
+          cat forge.config.json >> "$GITHUB_STEP_SUMMARY"
+          echo "```" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Forge build (${{ matrix.target }})
+        run: |
+          echo "Forging ${{ matrix.target }} artifact (.${{ matrix.ext }}) for ${{ github.repository }}"
+          echo "在这里接入 Capacitor / Tauri / electron-builder 等真实构建链"
+          mkdir -p dist
+          echo "forged-${{ matrix.target }}-${{ github.sha }}" > dist/forge-${{ matrix.target }}.${{ matrix.ext }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: forge-${{ matrix.target }}
+          path: dist/
+
+      - name: Release on tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
