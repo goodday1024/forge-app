@@ -1,8 +1,8 @@
-# 我的锻造应用
+# 云韶
 
 > 由 [FORGE // 网页锻造工坊](https://forge.example) 生成 · GitHub Action 多端打包
 
-- **入口 URL**: https://example.com
+- **入口 URL**: https://zihang.fun
 - **Bundle ID**: com.forge.myapp
 - **版本**: 1.0.0
 - **构建目标**: ios · android · windows · macos · linux
