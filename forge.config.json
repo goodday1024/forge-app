@@ -11,12 +11,12 @@
     "linux"
   ],
   "shell": "capacitor",
-  "accent": "#f6e05e",
+  "accent": "#c6ff3a",
   "window": {
     "width": 1280,
     "height": 800
   },
   "offline": true,
   "autoUpdate": true,
-  "generatedAt": "2026-06-30T10:16:33.645Z"
+  "generatedAt": "2026-06-30T10:26:00.680Z"
 }
